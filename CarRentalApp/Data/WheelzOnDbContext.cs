@@ -16,7 +16,7 @@ namespace CarRentalApp.Data
         public DbSet<Payment> Payments { get; set; }
         public DbSet<Review> Reviews { get; set; }
         public DbSet<Trips> Trips { get; set; }
-
+        public DbSet<Notification> Notifications { get; set; }
 
     }
 }

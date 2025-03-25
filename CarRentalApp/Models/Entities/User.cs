@@ -7,18 +7,24 @@ namespace CarRentalApp.Models.Entities
         [Key]
         public int UserId { get; set; }
 
-        [Required]
-        public string FullName { get; set; }
+        public string FirstName { get; set; }
 
-        [Required, EmailAddress]
+        public string Surname { get; set; }
+
+        public DateTime DateOfBirth { get; set; }
+
+        [Phone]
+        public string PhoneNumber { get; set; }
+
+        [EmailAddress]
         public string Email { get; set; }
 
-        [Required]
-        public string PasswordHash { get; set; }
+        public string Gender { get; set; }
 
-        [Required]
-        public string Phone { get; set; }
+        public string City { get; set; }
 
-        public string Role { get; set; } = "Customer";
+        public string? ProfilePictureUrl { get; set; } = string.Empty;
+
+        public bool IsDeleted { get; set; } = false;
     }
 }

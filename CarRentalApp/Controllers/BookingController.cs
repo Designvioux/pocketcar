@@ -19,6 +19,24 @@ public class BookingController : ControllerBase
     }
 
 
+    /*[HttpPost("create")]
+    public async Task<IActionResult> CreateBooking([FromBody] Booking request)
+    {
+        if (string.IsNullOrEmpty(request.FullName) || string.IsNullOrEmpty(request.ContactNumber))
+        {
+            return BadRequest("Full name and contact number are required.");
+        }
+
+        dbContext.Bookings.Add(request);
+        await dbContext.SaveChangesAsync();
+
+        string message = $"Booking Confirmation: {request.FullName}, Pickup: {request.PickupLocation} on {request.PickupDate}, Drop: {request.DropLocation} on {request.DropDate}.";
+        await _smsService.SendSmsAsync(request.ContactNumber, message);
+
+        return Ok(new { status = "Success", message = "Booking saved successfully!" });
+    }*/
+
+
     [HttpPost("create")]
     public async Task<IActionResult> CreateBooking([FromBody] Booking request)
     {
@@ -30,11 +48,38 @@ public class BookingController : ControllerBase
         dbContext.Bookings.Add(request);
         await dbContext.SaveChangesAsync();
 
-        //string message = $"Booking Confirmation: {request.FullName}, Pickup: {request.PickupLocation} on {request.PickupDate}, Drop: {request.DropLocation} on {request.DropDate}.";
-        //await _smsService.SendSmsAsync(request.ContactNumber, message);
+        // Create a new notification
+        var notification = new Notification
+        {
+            Header ="New Booking Request Received for Upcoming Trip",
+            Content = $"You have received a new booking request for a trip scheduled on <b>{request.PickupDate:dd MMM yyyy}</b>, <b>{request.PickupTime}</b>. " +
+          $"The passenger, <b>{request.FullName}</b>, has requested transportation from <b>{request.PickupLocation}</b> to <b>{request.DropLocation}</b>.",
+            CreatedAt = DateTime.UtcNow
+        };
+
+        dbContext.Notifications.Add(notification);
+        await dbContext.SaveChangesAsync();
 
         return Ok(new { status = "Success", message = "Booking saved successfully!" });
     }
+
+
+    [HttpGet("notifications")]
+    public async Task<IActionResult> GetNotifications()
+    {
+        var notifications = await dbContext.Notifications.OrderByDescending(n => n.CreatedAt).ToListAsync();
+        return Ok(notifications);
+    }
+
+    [HttpDelete("notifications/delete")]
+    public async Task<IActionResult> DeleteNotifications([FromBody] int[] notificationIds)
+    {
+        var notifications = dbContext.Notifications.Where(n => notificationIds.Contains(n.Id));
+        dbContext.Notifications.RemoveRange(notifications);
+        await dbContext.SaveChangesAsync();
+        return Ok(new { status = "Success", message = "Notifications deleted successfully!" });
+    }
+
 
     /*[HttpGet("all")]
     public async Task<ActionResult<IEnumerable<Booking>>> GetAllBookings()
