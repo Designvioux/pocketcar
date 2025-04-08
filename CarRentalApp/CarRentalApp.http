@@ -1,5 +1,7 @@
 @CarRentalApp_HostAddress = http://localhost:5022
 
+//@CarRentalApp_HostAddress = https://www.pocketcars.in/api
+
 GET {{CarRentalApp_HostAddress}}/weatherforecast/
 Accept: application/json
 

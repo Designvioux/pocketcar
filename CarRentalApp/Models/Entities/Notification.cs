@@ -1,7 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CarRentalApp.Models.Entities
 {
+    [Table("notifications")]
     public class Notification
     {
         [Key]

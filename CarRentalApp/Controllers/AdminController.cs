@@ -22,14 +22,39 @@ namespace CarRentalApp.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
         {
-            var admin = await _dbContext.Admin.FirstOrDefaultAsync(a => a.Email == loginDto.Email);
-            if (admin == null || admin.PasswordHash != loginDto.Password) // ✅ Plain text check
+            try
             {
-                return Unauthorized(new { message = "Invalid credentials" });
-            }
+                var admin = await _dbContext.Admin.FirstOrDefaultAsync(a => a.Email == loginDto.Email);
+                if (admin == null || admin.PasswordHash != loginDto.Password)
+                {
+                    return Unauthorized(new { message = "Invalid credentials" });
+                }
 
-            var token = _authService.GenerateJwtToken(admin.Email);
-            return Ok(new { token });
+                //var expiration = loginDto.KeepLoggedIn ? 30 : 1;
+                var token = _authService.GenerateJwtToken(admin.Email, 1);
+
+                return Ok(new { token });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"ERROR: {ex.Message}");
+                return StatusCode(500, new { message = "Something went wrong on the server." });
+            }
+        }
+
+        [HttpGet("test-admin")]
+        public async Task<IActionResult> TestAdmin()
+        {
+            try
+            {
+                var admin = await _dbContext.Admin.FirstOrDefaultAsync();
+                if (admin == null) return NotFound("No admin found.");
+                return Ok(admin);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"DB ERROR: {ex.Message}");
+            }
         }
     }
 
@@ -37,5 +62,6 @@ namespace CarRentalApp.Controllers
     {
         public string Email { get; set; }
         public string Password { get; set; }
+        //public bool KeepLoggedIn { get; set; }
     }
 }

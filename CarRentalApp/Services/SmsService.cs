@@ -2,7 +2,7 @@
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
+//using Newtonsoft.Json;
 using RestSharp;
 
 public class SmsService
@@ -35,7 +35,7 @@ public class SmsService
         _httpClient = new HttpClient();
     }
 
-    public async Task<string> SendSmsAsync(string number, string message)
+    /*public async Task<string> SendSmsAsync(string number, string message)
     {
         var values = new
         {
@@ -53,5 +53,5 @@ public class SmsService
 
         var response = await _httpClient.PostAsync("https://www.fast2sms.com/dev/bulkV2", content);
         return await response.Content.ReadAsStringAsync();
-    }
+    }*/
 }

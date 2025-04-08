@@ -182,6 +182,12 @@ public class BookingController : ControllerBase
     {
         public string Status { get; set; }
     }
+
+    [HttpGet("test")]
+    public IActionResult Test()
+    {
+        return Ok("BookingController is working!");
+    }
 }
 
 
@@ -243,3 +249,5 @@ public async Task<IActionResult> SendSms([FromBody] BookingRequest request)
     public string DropLocation { get; set; }
     public string DropDate { get; set; }
 }*/
+
+

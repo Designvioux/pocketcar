@@ -14,26 +14,38 @@ namespace CarRentalApp.Services
             _config = config;
         }
 
-        public string GenerateJwtToken(string adminEmail)
+        public string GenerateJwtToken(string adminEmail, int expirationInDays)
         {
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["JwtSettings:Secret"]));
-            var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-            var claims = new[]
+            try
             {
-            new Claim(ClaimTypes.Email, adminEmail),
-            new Claim(ClaimTypes.Role, "Admin")
-        };
+                var secretKey = _config["JwtSettings:Secret"];
+                if (string.IsNullOrWhiteSpace(secretKey))
+                    throw new Exception("Secret key not found");
 
-            var token = new JwtSecurityToken(
-                issuer: _config["JwtSettings:Issuer"],
-                audience: _config["JwtSettings:Audience"],
-                claims: claims,
-                expires: DateTime.UtcNow.AddMinutes(Convert.ToDouble(_config["JwtSettings:ExpirationMinutes"])),
-                signingCredentials: credentials
-            );
+                var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
+                var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-            return new JwtSecurityTokenHandler().WriteToken(token);
+                var claims = new[]
+                {
+                    new Claim(ClaimTypes.Email, adminEmail),
+                    new Claim(ClaimTypes.Role, "Admin")
+                };
+
+                var token = new JwtSecurityToken(
+                    issuer: _config["JwtSettings:Issuer"],
+                    audience: _config["JwtSettings:Audience"],
+                    claims: claims,
+                    expires: DateTime.UtcNow.AddDays(expirationInDays),
+                    signingCredentials: credentials
+                );
+
+                return new JwtSecurityTokenHandler().WriteToken(token);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("JWT ERROR: " + ex.Message);
+                throw new Exception("Error generating JWT token: " + ex.Message);
+            }
         }
     }
 }

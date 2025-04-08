@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace CarRentalApp.Models.Entities
 {
+    [Table("bookings")]
     public class Booking
     {
         [Key]
